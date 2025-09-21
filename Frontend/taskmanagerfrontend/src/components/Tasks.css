@@ -1,0 +1,91 @@
+.page-container {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(120deg, #fff8e1 0%, #ffe066 100%);
+  overflow: hidden;
+}
+
+.tasks-box {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px #ffe06644;
+  padding: 3rem 2.5rem 6rem 2.5rem;
+  width: 80vw;
+  height: 75vh;
+  min-width: 350px;
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  justify-content: flex-start;
+}
+
+.form-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  color: #232526;
+}
+
+.tasks-list {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  margin-bottom: 2rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  font-size: 1.2rem;
+  color: #232526; /* ✅ dark text so it's visible */
+}
+
+.delete-icon {
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #ff4d4f;
+  margin-right: 0.5rem;
+}
+
+.task-completed {
+  text-decoration: line-through;
+  color: #888; /* ✅ softer grey, but still visible */
+}
+
+.task-deadline {
+  color: #e6b800;
+  font-size: 1rem;
+  margin-left: 0.5rem; /* ✅ add spacing so it doesn't stick to text */
+}
+
+.add-task-btn {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #ffe066 0%, #ffd700 100%);
+  color: #232526;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 2.5rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #ffe06644;
+  transition: background 0.2s, color 0.2s;
+}
+
+.add-task-btn:hover {
+  background: #232526;
+  color: #ffe066;
+}

@@ -1,0 +1,13 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.dto.ProgressResponse;
+import com.klef.sdp.model.Task;
+import java.util.List;
+
+public interface TaskService {
+    Task addTask(Task task);
+    List<Task> getAllTasks();
+    Task toggleTaskStatus(Long id);   // ✅ updated to toggle instead of just complete
+    void deleteTask(Long id);
+    ProgressResponse getProgress();   // global progress (no user filter)
+}

@@ -1,0 +1,32 @@
+package com.klef.sdp.controller;
+
+import com.klef.sdp.model.User;
+import com.klef.sdp.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/task/user")
+@CrossOrigin("*")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    // Signup
+    @PostMapping("/signup")
+    public User register(@RequestBody User user) {
+        return userService.registerUser(user);
+    }
+
+    // Login
+    @PostMapping("/login")
+    public String login(@RequestBody User user) {
+        User loggedIn = userService.loginUser(user.getUsername(), user.getPassword());
+        if (loggedIn != null) {
+            return "Login Successful! Role: ";
+        } else {
+            return "Invalid Credentials!";
+        }
+    }
+}

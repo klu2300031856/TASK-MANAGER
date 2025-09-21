@@ -1,0 +1,32 @@
+package com.klef.sdp.controller;
+
+import com.klef.sdp.model.Admin;
+import com.klef.sdp.service.AdminService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@CrossOrigin("o")
+@RequestMapping("/task/admin")
+public class AdminController {
+
+    @Autowired
+    private AdminService adminService;
+
+    // Signup (Register new Admin)
+    @PostMapping("/signup")
+    public Admin register(@RequestBody Admin admin) {
+        return adminService.registerAdmin(admin);
+    }
+
+    // Login
+    @PostMapping("/login")
+    public String login(@RequestBody Admin admin) {
+        Admin loggedIn = adminService.loginAdmin(admin.getUsername(), admin.getPassword());
+        if (loggedIn != null) {
+            return "Admin Login Successful!";
+        } else {
+            return "Invalid Admin Credentials!";
+        }
+    }
+}

@@ -1,0 +1,27 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.model.Admin;
+import com.klef.sdp.repository.AdminRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AdminServiceImpl implements AdminService {
+
+    @Autowired
+    private AdminRepository adminRepository;
+
+    @Override
+    public Admin registerAdmin(Admin admin) {
+        return adminRepository.save(admin);
+    }
+
+    @Override
+    public Admin loginAdmin(String username, String password) {
+        Admin existing = adminRepository.findByUsername(username);
+        if (existing != null && existing.getPassword().equals(password)) {
+            return existing; // login success
+        }
+        return null; // login failed
+    }
+}

@@ -1,0 +1,11 @@
+package com.klef.sdp.dto;
+
+public class TaskResponse {
+    public Long id;
+    public String title;
+    public String description;
+    public String deadline; // "yyyy-MM-dd"
+    public String status;
+    public Boolean canComplete; // true if checkbox should show
+    public Long userId;
+}

@@ -1,0 +1,14 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.dto.ProgressResponse;
+import com.klef.sdp.model.Task;
+
+import java.util.List;
+
+public interface TaskService {
+    Task addTask(Task task);
+    List<Task> getAllTasks();
+    Task completeTask(Long id);            // returns updated Task or null on failure
+    void deleteTask(Long id);
+    ProgressResponse getProgress();        // global progress (no user filter)
+}

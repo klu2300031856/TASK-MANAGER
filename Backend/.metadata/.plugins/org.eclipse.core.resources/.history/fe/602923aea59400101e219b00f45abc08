@@ -1,0 +1,32 @@
+package com.klef.sdp.dto;
+
+public class ProgressResponse {
+    private long completed;
+    private long pending;
+    private long notCompleted;
+    private double completionPercentage;
+
+    // ✅ No-args constructor (needed for JSON serialization)
+    public ProgressResponse() {}
+
+    // ✅ All-args constructor (used in your service)
+    public ProgressResponse(long completed, long pending, long notCompleted, double completionPercentage) {
+        this.completed = completed;
+        this.pending = pending;
+        this.notCompleted = notCompleted;
+        this.completionPercentage = completionPercentage;
+    }
+
+    // ✅ Getters and Setters
+    public long getCompleted() { return completed; }
+    public void setCompleted(long completed) { this.completed = completed; }
+
+    public long getPending() { return pending; }
+    public void setPending(long pending) { this.pending = pending; }
+
+    public long getNotCompleted() { return notCompleted; }
+    public void setNotCompleted(long notCompleted) { this.notCompleted = notCompleted; }
+
+    public double getCompletionPercentage() { return completionPercentage; }
+    public void setCompletionPercentage(double completionPercentage) { this.completionPercentage = completionPercentage; }
+}

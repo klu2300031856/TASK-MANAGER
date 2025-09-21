@@ -1,0 +1,13 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.model.Task;
+import com.klef.sdp.model.User;
+import java.util.List;
+
+public interface TaskService {
+    Task addTask(Task task, User user);
+    List<Task> getTasks(User user);
+    void updateTaskStatus(Long taskId, boolean completed);
+    List<Task> getCompletedTasks(User user);
+    List<Task> getNotCompletedTasks(User user);
+}

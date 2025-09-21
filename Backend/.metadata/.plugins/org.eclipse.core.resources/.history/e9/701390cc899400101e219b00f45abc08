@@ -1,0 +1,59 @@
+package com.klef.sdp.controller;
+
+import com.klef.sdp.dto.ProgressResponse;
+import com.klef.sdp.model.Task;
+import com.klef.sdp.service.TaskService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@CrossOrigin(origins = "http://localhost:3000") // allow React dev server; modify if needed
+@RestController
+@RequestMapping("/tasks")
+public class TaskController {
+
+    @Autowired
+    private TaskService taskService;
+
+    // Add task
+    @PostMapping("/add")
+    public ResponseEntity<?> addTask(@RequestBody Task task) {
+        try {
+            Task saved = taskService.addTask(task);
+            return ResponseEntity.ok(saved);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body("Error: " + ex.getMessage());
+        }
+    }
+
+    // Get all tasks
+    @GetMapping("/all")
+    public ResponseEntity<List<Task>> getAll() {
+        return ResponseEntity.ok(taskService.getAllTasks());
+    }
+
+    // Complete a task
+    @PutMapping("/complete/{id}")
+    public ResponseEntity<String> complete(@PathVariable Long id) {
+        Task updated = taskService.completeTask(id);
+        if (updated != null) {
+            return ResponseEntity.ok("Task marked as completed.");
+        } else {
+            return ResponseEntity.badRequest().body("Deadline passed or Task not found.");
+        }
+    }
+
+    // Delete
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.ok("Task deleted.");
+    }
+
+    // Progress summary
+    @GetMapping("/progress")
+    public ResponseEntity<ProgressResponse> progress() {
+        return ResponseEntity.ok(taskService.getProgress());
+    }
+}

@@ -1,0 +1,61 @@
+package com.klef.sdp.controller;
+
+import com.klef.sdp.dto.ProgressResponse;
+import com.klef.sdp.dto.TaskRequest;
+import com.klef.sdp.dto.TaskResponse;
+import com.klef.sdp.service.TaskService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/tasks")
+public class TaskController {
+
+    @Autowired
+    private TaskService taskService;
+
+    @PostMapping("/add")
+    public ResponseEntity<?> addTask(@RequestBody TaskRequest req) {
+        try {
+            TaskResponse res = taskService.createTask(req);
+            return ResponseEntity.ok(res);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<TaskResponse>> getTasks(@PathVariable Long userId) {
+        return ResponseEntity.ok(taskService.getTasksByUser(userId));
+    }
+
+    @PutMapping("/complete/{id}")
+    public ResponseEntity<String> complete(@PathVariable Long id) {
+        String msg = taskService.completeTask(id);
+        if ("Task marked as completed.".equals(msg)) return ResponseEntity.ok(msg);
+        return ResponseEntity.badRequest().body(msg);
+    }
+
+    @GetMapping("/progress/{userId}")
+    public ResponseEntity<ProgressResponse> progress(@PathVariable Long userId) {
+        return ResponseEntity.ok(taskService.getProgress(userId));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody TaskRequest req) {
+        try {
+            TaskResponse r = taskService.updateTask(id, req);
+            return ResponseEntity.ok(r);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.ok("Deleted");
+    }
+}

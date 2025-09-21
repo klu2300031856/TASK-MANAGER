@@ -1,0 +1,32 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.dto.TaskDTO;
+import com.klef.sdp.model.Task;
+import com.klef.sdp.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class AdminServiceImpl implements AdminService {
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Override
+    public List<TaskDTO> getAllUserTasks() {
+        List<Task> tasks = taskRepository.findAll();
+
+        return tasks.stream().map(t -> {
+            TaskDTO dto = new TaskDTO();
+            dto.setId(t.getId());
+            dto.setUsername(t.getUsername());   // ✅ already present in Task
+            dto.setTitle(t.getTitle());
+            dto.setDescription(t.getDescription());
+            dto.setStatus(t.getStatus());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+}

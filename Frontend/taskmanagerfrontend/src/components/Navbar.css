@@ -1,0 +1,47 @@
+.navbar {
+  width: 100vw;
+  background: #232526;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2.5rem;
+  box-sizing: border-box;
+  box-shadow: 0 2px 12px #23252644;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  filter: drop-shadow(0 2px 8px #ffe06688);
+}
+
+.navbar-title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.navbar-login {
+  background: #fff;
+  color: #232526;
+  border: none;
+  border-radius: 20px;
+  padding: 0.6rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #ffe06644;
+  transition: background 0.2s, color 0.2s;
+}
+
+.navbar-login:hover {
+  background: #ffe066;
+  color: #232526;
+}

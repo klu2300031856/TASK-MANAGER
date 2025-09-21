@@ -1,0 +1,31 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.model.User;
+import com.klef.sdp.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Override
+    public User registerUser(User user) {
+        // Default role = USER
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("USER");
+        }
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User loginUser(String username, String password) {
+        User existing = userRepository.findByUsername(username);
+        if (existing != null && existing.getPassword().equals(password)) {
+            return existing;  // login success
+        }
+        return null;  // login failed
+    }
+}

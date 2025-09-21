@@ -1,0 +1,11 @@
+package com.klef.sdp.dto;
+
+import java.util.List;
+
+public class ProgressResponse {
+    public List<TaskResponse> completedTasks;
+    public List<TaskResponse> notCompletedTasks; // missed deadlines & still pending
+    public int progressPercentage;
+    public int totalTasks;
+    public int completedCount;
+}

@@ -1,0 +1,73 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.dto.ProgressResponse;
+import com.klef.sdp.model.Task;
+import com.klef.sdp.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class TaskServiceImpl implements TaskService {
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Override
+    public Task addTask(Task task) {
+        task.setStatus("PENDING");
+        return taskRepository.save(task);
+    }
+
+    @Override
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
+    }
+
+    @Override
+    public Task completeTask(Long id) {
+        Task task = taskRepository.findById(id).orElse(null);
+        if (task == null) return null;
+        LocalDate dl = task.getDeadline();
+        LocalDate now = LocalDate.now();
+        // if has deadline and already passed -> cannot complete
+        if (dl != null && dl.isBefore(now)) {
+            return null;
+        }
+        task.setStatus("COMPLETED");
+        return taskRepository.save(task);
+    }
+
+    @Override
+    public void deleteTask(Long id) {
+        taskRepository.deleteById(id);
+    }
+
+    @Override
+    public ProgressResponse getProgress() {
+        List<Task> all = taskRepository.findAll();
+        List<Task> completed = all.stream()
+                .filter(t -> "COMPLETED".equalsIgnoreCase(t.getStatus()))
+                .collect(Collectors.toList());
+        List<Task> notCompleted = all.stream()
+                .filter(t -> !"COMPLETED".equalsIgnoreCase(t.getStatus()) &&
+                        t.getDeadline() != null &&
+                        t.getDeadline().isBefore(LocalDate.now()))
+                .collect(Collectors.toList());
+
+        int total = all.size();
+        int completedCount = completed.size();
+        int percent = total > 0 ? (int)Math.round((completedCount * 100.0) / total) : 0;
+
+        ProgressResponse res = new ProgressResponse();
+        res.completedTasks = completed;
+        res.notCompletedTasks = notCompleted;
+        res.progressPercentage = percent;
+        res.totalTasks = total;
+        res.completedCount = completedCount;
+        return res;
+    }
+}

@@ -1,0 +1,62 @@
+package com.klef.sdp.controller;
+
+import com.klef.sdp.model.Task;
+import com.klef.sdp.model.User;
+import com.klef.sdp.service.TaskService;
+import com.klef.sdp.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/task/user/tasks")
+public class TaskController {
+
+    @Autowired
+    private TaskService taskService;
+
+    @Autowired
+    private UserService userService;
+
+    // 1️⃣ Add Task
+    @PostMapping("/add")
+    public Task addTask(@PathVariable String username, @RequestBody Task task) {
+        User user = userService.loginUser(username, null); // fetch user by username
+        return taskService.addTask(task, user);
+    }
+
+    // 2️⃣ Get all tasks
+    @GetMapping("/{username}")
+    public List<Task> getTasks(@PathVariable String username) {
+        User user = userService.loginUser(username, null);
+        return taskService.getTasks(user);
+    }
+
+    // 3️⃣ Update task completion status
+    @PutMapping("/update/{taskId}")
+    public String updateTaskStatus(@PathVariable Long taskId, @RequestParam boolean completed) {
+        taskService.updateTaskStatus(taskId, completed);
+        return "Task status updated!";
+    }
+
+    // 4️⃣ Get progress
+    @GetMapping("/progress/{username}")
+    public Map<String, Object> getProgress(@PathVariable String username) {
+        User user = userService.loginUser(username, null);
+        List<Task> completed = taskService.getCompletedTasks(user);
+        List<Task> notCompleted = taskService.getNotCompletedTasks(user);
+
+        int total = completed.size() + notCompleted.size();
+        double percent = total == 0 ? 0 : (completed.size() * 100.0) / total;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("completedTasks", completed);
+        result.put("notCompletedTasks", notCompleted);
+        result.put("progressPercent", percent);
+
+        return result;
+    }
+}

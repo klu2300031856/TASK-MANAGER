@@ -1,0 +1,8 @@
+package com.klef.sdp.dto;
+
+public class TaskRequest {
+    public String title;
+    public String description;
+    public String deadline; // "yyyy-MM-dd" or null
+    public Long userId;
+}

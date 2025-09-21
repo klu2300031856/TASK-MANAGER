@@ -1,0 +1,59 @@
+package com.klef.sdp.controller;
+
+import com.klef.sdp.dto.ProgressResponse;
+import com.klef.sdp.model.Task;
+import com.klef.sdp.service.TaskService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@CrossOrigin("*") // allow React dev server; modify if needed
+@RestController
+@RequestMapping("/tasks")
+public class TaskController {
+
+    @Autowired
+    private TaskService taskService;
+
+    // ➕ Add task
+    @PostMapping("/addtask")
+    public ResponseEntity<?> addTask(@RequestBody Task task) {
+        try {
+            Task saved = taskService.addTask(task);
+            return ResponseEntity.ok(saved);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body("Error: " + ex.getMessage());
+        }
+    }
+
+    // 📋 Get all tasks
+    @GetMapping("/view")
+    public ResponseEntity<List<Task>> getAll() {
+        return ResponseEntity.ok(taskService.getAllTasks());
+    }
+
+    // ✅ Toggle complete/pending
+    @PatchMapping("/complete/{id}")
+    public ResponseEntity<?> toggleTask(@PathVariable Long id) {
+        try {
+            Task updated = taskService.toggleTaskStatus(id);
+            return ResponseEntity.ok(updated);  // return updated task for React
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body("Error: " + ex.getMessage());
+        }
+    }
+
+    // 🗑️ Delete task
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.ok("Task deleted.");
+    }
+
+    // 📊 Progress summary
+    @GetMapping("/progress")
+    public ResponseEntity<ProgressResponse> progress() {
+        return ResponseEntity.ok(taskService.getProgress());
+    }
+}

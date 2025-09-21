@@ -1,0 +1,46 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.dto.AdminTaskDTO;
+import com.klef.sdp.model.Admin;
+import com.klef.sdp.model.Task;
+import com.klef.sdp.repository.AdminRepository;
+import com.klef.sdp.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class AdminServiceImpl implements AdminService {
+
+    @Autowired
+    private AdminRepository adminRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Override
+    public Admin registerAdmin(Admin admin) {
+        return adminRepository.save(admin);
+    }
+
+    @Override
+    public Admin loginAdmin(String username, String password) {
+        return adminRepository.findByUsernameAndPassword(username, password);
+    }
+
+    @Override
+    public List<AdminTaskDTO> getAllUserTasks() {
+        List<Task> tasks = taskRepository.findAll();
+        return tasks.stream().map(t -> {
+            AdminTaskDTO dto = new AdminTaskDTO();
+            dto.setId(t.getId());
+            dto.setUsername(t.getUsername());   // ✅ use direct username field
+            dto.setTitle(t.getTitle());
+            dto.setDescription(t.getDescription());
+            dto.setStatus(t.getStatus());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+}

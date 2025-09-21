@@ -1,0 +1,16 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.dto.ProgressResponse;
+import com.klef.sdp.dto.TaskRequest;
+import com.klef.sdp.dto.TaskResponse;
+
+import java.util.List;
+
+public interface TaskService {
+    TaskResponse createTask(TaskRequest req);
+    List<TaskResponse> getTasksByUser(Long userId);
+    String completeTask(Long taskId);
+    ProgressResponse getProgress(Long userId);
+    TaskResponse updateTask(Long id, TaskRequest req);
+    void deleteTask(Long id);
+}

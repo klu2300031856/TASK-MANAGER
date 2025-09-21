@@ -1,0 +1,128 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.dto.ProgressResponse;
+import com.klef.sdp.dto.TaskRequest;
+import com.klef.sdp.dto.TaskResponse;
+import com.klef.sdp.model.Task;
+import com.klef.sdp.model.User;
+import com.klef.sdp.repository.TaskRepository;
+import com.klef.sdp.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+public class TaskServiceImpl implements TaskService {
+
+    @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    private TaskResponse toResponse(Task t) {
+        TaskResponse r = new TaskResponse();
+        r.id = t.getId();
+        r.title = t.getTitle();
+        r.description = t.getDescription();
+        r.deadline = t.getDeadline() != null ? t.getDeadline().toString() : null;
+        r.status = t.getStatus();
+        r.userId = t.getUser() != null ? t.getUser().getId() : null;
+
+        boolean canComplete = "PENDING".equals(t.getStatus()) &&
+                (t.getDeadline() == null || !t.getDeadline().isBefore(LocalDate.now()));
+        r.canComplete = canComplete;
+        return r;
+    }
+
+    @Override
+    public TaskResponse createTask(TaskRequest req) {
+        if (req.userId == null) throw new RuntimeException("userId is required");
+        Optional<User> u = userRepository.findById(req.userId);
+        if (u.isEmpty()) throw new RuntimeException("User not found with id: " + req.userId);
+
+        Task t = new Task();
+        t.setTitle(req.title);
+        t.setDescription(req.description);
+        if (req.deadline != null && !req.deadline.isBlank()) {
+            try {
+                t.setDeadline(LocalDate.parse(req.deadline));
+            } catch (DateTimeParseException ex) {
+                throw new RuntimeException("Invalid date format. Use yyyy-MM-dd");
+            }
+        }
+        t.setStatus("PENDING");
+        t.setUser(u.get());
+        Task saved = taskRepository.save(t);
+        return toResponse(saved);
+    }
+
+    @Override
+    public List<TaskResponse> getTasksByUser(Long userId) {
+        List<Task> tasks = taskRepository.findByUserId(userId);
+        return tasks.stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public String completeTask(Long taskId) {
+        Optional<Task> opt = taskRepository.findById(taskId);
+        if (opt.isEmpty()) return "Task not found.";
+
+        Task t = opt.get();
+        if ("COMPLETED".equals(t.getStatus())) return "Task already completed.";
+        LocalDate today = LocalDate.now();
+        if (t.getDeadline() != null && t.getDeadline().isBefore(today)) {
+            return "Deadline passed! Cannot mark as complete.";
+        }
+        t.setStatus("COMPLETED");
+        taskRepository.save(t);
+        return "Task marked as completed.";
+    }
+
+    @Override
+    public ProgressResponse getProgress(Long userId) {
+        List<Task> tasks = taskRepository.findByUserId(userId);
+        List<TaskResponse> completed = tasks.stream()
+                .filter(x -> "COMPLETED".equals(x.getStatus()))
+                .map(this::toResponse).collect(Collectors.toList());
+
+        List<TaskResponse> notCompleted = tasks.stream()
+                .filter(x -> "PENDING".equals(x.getStatus()) && x.getDeadline() != null && x.getDeadline().isBefore(LocalDate.now()))
+                .map(this::toResponse).collect(Collectors.toList());
+
+        int total = tasks.size();
+        int completedCount = completed.size();
+        int percent = total > 0 ? (int)Math.round((completedCount * 100.0) / total) : 0;
+
+        ProgressResponse r = new ProgressResponse();
+        r.completedTasks = completed;
+        r.notCompletedTasks = notCompleted;
+        r.progressPercentage = percent;
+        r.totalTasks = total;
+        r.completedCount = completedCount;
+        return r;
+    }
+
+    @Override
+    public TaskResponse updateTask(Long id, TaskRequest req) {
+        Optional<Task> opt = taskRepository.findById(id);
+        if (opt.isEmpty()) throw new RuntimeException("Task not found");
+        Task t = opt.get();
+        if (req.title != null) t.setTitle(req.title);
+        if (req.description != null) t.setDescription(req.description);
+        if (req.deadline != null && !req.deadline.isBlank()) {
+            t.setDeadline(LocalDate.parse(req.deadline));
+        }
+        Task saved = taskRepository.save(t);
+        return toResponse(saved);
+    }
+
+    @Override
+    public void deleteTask(Long id) {
+        taskRepository.deleteById(id);
+    }
+}

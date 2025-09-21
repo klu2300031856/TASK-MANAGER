@@ -1,0 +1,67 @@
+package com.klef.sdp.service;
+
+import com.klef.sdp.dto.ProgressResponse;
+import com.klef.sdp.model.Task;
+import com.klef.sdp.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+public class TaskServiceImpl implements TaskService {
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Override
+    public Task addTask(Task task) {
+        task.setStatus("PENDING");   // default
+        return taskRepository.save(task);
+    }
+
+    @Override
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
+    }
+
+    @Override
+    public Task toggleTaskStatus(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        // ⏰ If deadline is missed, don’t allow marking as completed
+        if ("PENDING".equals(task.getStatus()) && task.getDeadline().isBefore(LocalDate.now())) {
+            throw new RuntimeException("Deadline passed! Cannot mark as completed.");
+        }
+
+        if ("COMPLETED".equals(task.getStatus())) {
+            task.setStatus("PENDING"); // toggle back
+        } else {
+            task.setStatus("COMPLETED"); // mark complete
+        }
+
+        return taskRepository.save(task);
+    }
+
+    @Override
+    public void deleteTask(Long id) {
+        taskRepository.deleteById(id);
+    }
+
+    @Override
+    public ProgressResponse getProgress() {
+        List<Task> tasks = taskRepository.findAll();
+        long total = tasks.size();
+        long completed = tasks.stream().filter(t -> "COMPLETED".equals(t.getStatus())).count();
+        long notCompleted = tasks.stream().filter(t ->
+                "PENDING".equals(t.getStatus()) && t.getDeadline().isBefore(LocalDate.now())
+        ).count();
+        long pending = total - completed - notCompleted;
+
+        double percentage = total == 0 ? 0 : (completed * 100.0 / total);
+
+        return new ProgressResponse(completed, pending, notCompleted, percentage);
+    }
+}
